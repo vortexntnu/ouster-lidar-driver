@@ -1,4 +1,4 @@
-ARG ROS_DISTRO=melodic
+ARG ROS_DISTRO=noetic
 
 FROM ros:${ROS_DISTRO}-ros-core AS build-env
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -25,7 +25,7 @@ RUN set -xe \
 && useradd -o -u ${BUILD_UID} -d ${BUILD_HOME} -rm -s /bin/bash -g build build
 
 # Install build dependencies using rosdep
-COPY --chown=build:build ouster_ros/package.xml ${OUSTER_SDK_PATH}/ouster_ros/package.xml
+COPY --chown=build:build ./package.xml ${OUSTER_SDK_PATH}/ouster_ros/package.xml
 
 RUN set -xe \
 && apt-get update \
