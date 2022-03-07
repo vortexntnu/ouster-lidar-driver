@@ -3,7 +3,7 @@ ARG ROS_DISTRO=noetic
 FROM ros:${ROS_DISTRO}-ros-core AS build-env
 ENV DEBIAN_FRONTEND=noninteractive \
     BUILD_HOME=/var/lib/build \
-    OUSTER_SDK_PATH=/opt/ouster_example
+    OUSTER_SDK_PATH=/opt/ouster_lidar_driver
 
 RUN set -xue \
 # Kinetic and melodic have python3 packages but they seem to conflict
@@ -14,6 +14,7 @@ RUN set -xue \
 && apt-get install -y \
  build-essential cmake \
  fakeroot dpkg-dev debhelper \
+ python3-catkin-tools \
  $PY-rosdep $PY-rospkg $PY-bloom
 
 # Set up non-root build user
@@ -25,7 +26,7 @@ RUN set -xe \
 && useradd -o -u ${BUILD_UID} -d ${BUILD_HOME} -rm -s /bin/bash -g build build
 
 # Install build dependencies using rosdep
-COPY --chown=build:build ./package.xml ${OUSTER_SDK_PATH}/ouster_ros/package.xml
+COPY --chown=build:build ./ouster_ros/package.xml ${OUSTER_SDK_PATH}/ouster_ros/package.xml
 
 RUN set -xe \
 && apt-get update \
@@ -46,7 +47,7 @@ RUN set -xe \
 
 FROM build-env
 
-RUN /opt/ros/${ROS_DISTRO}/env.sh catkin_make -DCMAKE_BUILD_TYPE=Release
+RUN /opt/ros/${ROS_DISTRO}/env.sh catkin build
 
 # Entrypoint for running Ouster ros:
 #
